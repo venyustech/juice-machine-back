@@ -1,0 +1,143 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum JuiceType {
+  SHARK
+  NATURAL
+  FUNCTIONAL
+  THAI
+  SMOOTHIE
+  GENERIC
+}
+
+enum OrderStatus {
+  RECEIVED
+  IN_PREPARATION
+  DISPATCHED
+  DELIVERED
+}
+
+model Option {
+  id           Int           @id @default(autoincrement())
+  name         String
+  juiceOptions JuiceOption[]
+  orderOptions OrderOption[]
+
+  @@map("option")
+}
+
+model Extra {
+  id         Int          @id @default(autoincrement())
+  name       String
+  value      BigInt
+  juices     JuiceExtra[]
+  OrderExtra OrderExtra[]
+
+  @@map("extra")
+}
+
+model Fruit {
+  id     Int          @id @default(autoincrement())
+  name   String
+  juices JuiceFruit[]
+
+  @@map("fruit")
+}
+
+model Juice {
+  id        Int           @id @default(autoincrement())
+  name      String
+  value     BigInt
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  juiceType JuiceType
+  options   JuiceOption[]
+  extras    JuiceExtra[]
+  fruits    JuiceFruit[]
+  orders    Order[]
+
+  @@map("juice")
+}
+
+model JuiceOption {
+  id       Int    @id @default(autoincrement())
+  juice    Juice  @relation(fields: [juiceId], references: [id])
+  juiceId  Int
+  option   Option @relation(fields: [optionId], references: [id])
+  optionId Int
+
+  @@map("juice-option")
+}
+
+model JuiceExtra {
+  id      Int   @id @default(autoincrement())
+  juice   Juice @relation(fields: [juiceId], references: [id])
+  juiceId Int
+  extra   Extra @relation(fields: [extraId], references: [id])
+  extraId Int
+
+  @@map("juice-extra")
+}
+
+model JuiceFruit {
+  id      Int   @id @default(autoincrement())
+  juice   Juice @relation(fields: [juiceId], references: [id])
+  juiceId Int
+  fruit   Fruit @relation(fields: [fruitId], references: [id])
+  fruitId Int
+
+  @@map("juice-fruit")
+}
+
+model Machine {
+  id        Int      @id @default(autoincrement())
+  name      String
+  local     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    Order[]
+
+  @@map("machine")
+}
+
+model Order {
+  id           Int           @id @default(autoincrement())
+  juice        Juice         @relation(fields: [juiceId], references: [id])
+  juiceId      Int
+  machine      Machine       @relation(fields: [machineId], references: [id])
+  machineId    Int
+  userDocument String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  options      OrderOption[]
+  extras       OrderExtra[]
+  status       OrderStatus
+
+  @@map("order")
+}
+
+model OrderOption {
+  id       Int    @id @default(autoincrement())
+  order    Order  @relation(fields: [orderId], references: [id])
+  orderId  Int
+  option   Option @relation(fields: [optionId], references: [id])
+  optionId Int
+
+  @@map("order-option")
+}
+
+model OrderExtra {
+  id      Int   @id @default(autoincrement())
+  order   Order @relation(fields: [orderId], references: [id])
+  orderId Int
+  extra   Extra @relation(fields: [extraId], references: [id])
+  extraId Int
+
+  @@map("order-extra")
+}
