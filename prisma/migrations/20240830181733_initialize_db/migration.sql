@@ -22,15 +22,7 @@ CREATE TABLE "extra" (
 );
 
 -- CreateTable
-CREATE TABLE "Ingredient" (
-    "id" SERIAL NOT NULL,
-    "name" TEXT NOT NULL,
-
-    CONSTRAINT "Ingredient_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "juice" (
+CREATE TABLE "Juice" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "value" INTEGER NOT NULL,
@@ -40,7 +32,24 @@ CREATE TABLE "juice" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "juiceType" "JuiceType" NOT NULL,
 
-    CONSTRAINT "juice_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Juice_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "JuiceIngredient" (
+    "id" SERIAL NOT NULL,
+    "juiceId" INTEGER NOT NULL,
+    "ingredientId" INTEGER NOT NULL,
+
+    CONSTRAINT "JuiceIngredient_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Ingredient" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+
+    CONSTRAINT "Ingredient_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -59,15 +68,6 @@ CREATE TABLE "juice-extra" (
     "extraId" INTEGER NOT NULL,
 
     CONSTRAINT "juice-extra_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "juice-Ingredient" (
-    "id" SERIAL NOT NULL,
-    "juiceId" INTEGER NOT NULL,
-    "ingredientId" INTEGER NOT NULL,
-
-    CONSTRAINT "juice-Ingredient_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -113,25 +113,25 @@ CREATE TABLE "order-extra" (
 );
 
 -- AddForeignKey
-ALTER TABLE "juice-option" ADD CONSTRAINT "juice-option_juiceId_fkey" FOREIGN KEY ("juiceId") REFERENCES "juice"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "JuiceIngredient" ADD CONSTRAINT "JuiceIngredient_juiceId_fkey" FOREIGN KEY ("juiceId") REFERENCES "Juice"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "JuiceIngredient" ADD CONSTRAINT "JuiceIngredient_ingredientId_fkey" FOREIGN KEY ("ingredientId") REFERENCES "Ingredient"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "juice-option" ADD CONSTRAINT "juice-option_juiceId_fkey" FOREIGN KEY ("juiceId") REFERENCES "Juice"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "juice-option" ADD CONSTRAINT "juice-option_optionId_fkey" FOREIGN KEY ("optionId") REFERENCES "option"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "juice-extra" ADD CONSTRAINT "juice-extra_juiceId_fkey" FOREIGN KEY ("juiceId") REFERENCES "juice"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "juice-extra" ADD CONSTRAINT "juice-extra_juiceId_fkey" FOREIGN KEY ("juiceId") REFERENCES "Juice"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "juice-extra" ADD CONSTRAINT "juice-extra_extraId_fkey" FOREIGN KEY ("extraId") REFERENCES "extra"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "juice-Ingredient" ADD CONSTRAINT "juice-Ingredient_juiceId_fkey" FOREIGN KEY ("juiceId") REFERENCES "juice"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "juice-Ingredient" ADD CONSTRAINT "juice-Ingredient_ingredientId_fkey" FOREIGN KEY ("ingredientId") REFERENCES "Ingredient"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "order" ADD CONSTRAINT "order_juiceId_fkey" FOREIGN KEY ("juiceId") REFERENCES "juice"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "order" ADD CONSTRAINT "order_juiceId_fkey" FOREIGN KEY ("juiceId") REFERENCES "Juice"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "order" ADD CONSTRAINT "order_machineId_fkey" FOREIGN KEY ("machineId") REFERENCES "machine"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

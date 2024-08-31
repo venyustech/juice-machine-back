@@ -8,11 +8,14 @@ import {
   SmoothieJuice,
   ThaiJuice
 } from '../src/types/juiceTypes.js'
+import extraFactory from '../tests/factory/extraFactory.js'
 import ingredientsFactory from '../tests/factory/ingredientsFactory.js'
+import { juiceIngredientMapping } from '../tests/factory/juiceIngredients.js'
 import juicesFactory from '../tests/factory/juicesFactory.js'
 
 async function main() {
   await createOptions()
+  await createExtras()
   await createIngredients()
   await createJuices()
 }
@@ -33,7 +36,12 @@ async function createOptions(): Promise<void> {
     skipDuplicates: true
   })
 }
-
+async function createExtras(): Promise<void> {
+  await prisma.extra.createMany({
+    data: extraFactory.extraData(),
+    skipDuplicates: true
+  })
+}
 async function createIngredients(): Promise<void> {
   await prisma.ingredient.createMany({
     data: ingredientsFactory.ingredientsData(),
@@ -50,6 +58,7 @@ async function createJuices(): Promise<void> {
   await createGenericDrinks()
   await createJuicesOptions()
   await createJuicesExtras()
+  await createJuiceIngredients()
 }
 
 async function createSharkJuices(): Promise<void> {
@@ -152,6 +161,60 @@ async function createJuicesExtras(): Promise<void> {
   )
   await prisma.juiceExtra.createMany({
     data: juiceExtrasData,
+    skipDuplicates: true
+  })
+}
+
+async function createJuiceIngredients(): Promise<void> {
+  // Passo 1: Obter todos os sucos e mapear pelo nome para fácil acesso
+  const juices = await prisma.juice.findMany({
+    select: {
+      id: true,
+      name: true
+    }
+  })
+
+  // Passo 2: Obter todos os ingredientes e mapear pelo nome para fácil acesso
+  const ingredients = await prisma.ingredient.findMany({
+    select: {
+      id: true,
+      name: true
+    }
+  })
+
+  // Criar um mapa de nome do suco para ID do suco
+  const juiceMap: Record<string, number> = juices.reduce((map, juice) => {
+    map[juice.name] = juice.id
+    return map
+  }, {} as Record<string, number>)
+
+  // Criar um mapa de nome do ingrediente para ID do ingrediente
+  const ingredientMap: Record<string, number> = ingredients.reduce((map, ingredient) => {
+    map[ingredient.name] = ingredient.id
+    return map
+  }, {} as Record<string, number>)
+
+  // Definindo o tipo explicitamente para evitar o erro
+  const juiceIngredientsData: { juiceId: number; ingredientId: number }[] = []
+
+  // Passo 3: Criar as entradas na tabela JuiceIngredient
+  for (const [juiceName, ingredientNames] of Object.entries(juiceIngredientMapping)) {
+    const juiceId = juiceMap[juiceName]
+    if (!juiceId) continue
+
+    for (const ingredientName of ingredientNames) {
+      const ingredientId = ingredientMap[ingredientName]
+      if (!ingredientId) continue
+
+      juiceIngredientsData.push({
+        juiceId,
+        ingredientId
+      })
+    }
+  }
+
+  await prisma.juiceIngredient.createMany({
+    data: juiceIngredientsData,
     skipDuplicates: true
   })
 }

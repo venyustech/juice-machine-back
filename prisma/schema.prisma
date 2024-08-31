@@ -42,14 +42,6 @@ model Extra {
   @@map("extra")
 }
 
-model Ingredient {
-  id     Int               @id @default(autoincrement())
-  name   String
-  juices JuiceIngredient[]
-
-  @@map("Ingredient")
-}
-
 model Juice {
   id          Int               @id @default(autoincrement())
   name        String
@@ -61,10 +53,22 @@ model Juice {
   juiceType   JuiceType
   options     JuiceOption[]
   extras      JuiceExtra[]
-  ingredient  JuiceIngredient[]
+  ingredient  JuiceIngredient[] // Relacionamento correto com JuiceIngredient
   orders      Order[]
+}
 
-  @@map("juice")
+model JuiceIngredient {
+  id           Int        @id @default(autoincrement())
+  juice        Juice      @relation(fields: [juiceId], references: [id])
+  juiceId      Int
+  ingredients  Ingredient @relation(fields: [ingredientId], references: [id])
+  ingredientId Int
+}
+
+model Ingredient {
+  id     Int               @id @default(autoincrement())
+  name   String
+  juices JuiceIngredient[]
 }
 
 model JuiceOption {
@@ -85,16 +89,6 @@ model JuiceExtra {
   extraId Int
 
   @@map("juice-extra")
-}
-
-model JuiceIngredient {
-  id           Int        @id @default(autoincrement())
-  juice        Juice      @relation(fields: [juiceId], references: [id])
-  juiceId      Int
-  ingredients  Ingredient @relation(fields: [ingredientId], references: [id])
-  ingredientId Int
-
-  @@map("juice-Ingredient")
 }
 
 model Machine {
