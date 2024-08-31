@@ -12,12 +12,14 @@ import extraFactory from '../tests/factory/extraFactory.js'
 import ingredientsFactory from '../tests/factory/ingredientsFactory.js'
 import { juiceIngredientMapping } from '../tests/factory/juiceIngredients.js'
 import juicesFactory from '../tests/factory/juicesFactory.js'
+import machinesFactory from '../tests/factory/machinesFactory.js'
 
 async function main() {
   await createOptions()
   await createExtras()
   await createIngredients()
   await createJuices()
+  await createMachines()
 }
 
 main()
@@ -215,6 +217,13 @@ async function createJuiceIngredients(): Promise<void> {
 
   await prisma.juiceIngredient.createMany({
     data: juiceIngredientsData,
+    skipDuplicates: true
+  })
+}
+
+async function createMachines() {
+  await prisma.machine.createMany({
+    data: machinesFactory.machinesData(),
     skipDuplicates: true
   })
 }

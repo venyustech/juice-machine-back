@@ -1,4 +1,3 @@
--- Criação das tabelas
 CREATE TABLE IF NOT EXISTS "option" (
     "id" serial PRIMARY KEY,
     "name" varchar(255) NOT NULL UNIQUE
@@ -75,21 +74,18 @@ CREATE TABLE IF NOT EXISTS "order-extra" (
     "extraId" int REFERENCES "extra"("id")
 );
 
--- Inserir Opções
 INSERT INTO "option" ("name") VALUES 
 ('sugar'),
 ('ice'),
 ('milk')
 ON CONFLICT DO NOTHING;
 
--- Inserir Extras
 INSERT INTO "extra" ("name", "value") VALUES 
 ('chantilly', 200),
 ('alcohol', 300),
 ('whey', 250)
 ON CONFLICT DO NOTHING;
 
--- Inserir Ingredientes
 INSERT INTO "ingredient" ("name") VALUES 
 ('Laranja'),
 ('Maçã'),
@@ -188,3 +184,10 @@ INSERT INTO "juice-extra" ("juiceId", "extraId")
 SELECT juice.id, extra.id 
 FROM "juice", "extra"
 WHERE extra.name IN ('chantilly', 'alcohol', 'whey');
+
+-- Criar lugares com as maquinas de sucos
+INSERT INTO Machine (name, local) VALUES 
+('Rua Benjamin Constant, 29 - Torre Recife - PE', '50710150'),
+('Av. República do Líbano, 251 - Pina, Recife - PE', '51110160'),
+('R. Pamplona, 1005 - Jardim Paulista, São Paulo - SP', '01405001')
+ON CONFLICT (name, local) DO NOTHING;
