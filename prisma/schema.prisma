@@ -35,34 +35,40 @@ model Option {
 model Extra {
   id         Int          @id @default(autoincrement())
   name       String
-  value      BigInt
+  value      Int
   juices     JuiceExtra[]
   OrderExtra OrderExtra[]
 
   @@map("extra")
 }
 
-model Fruit {
-  id     Int          @id @default(autoincrement())
-  name   String
-  juices JuiceFruit[]
-
-  @@map("fruit")
+model Juice {
+  id          Int               @id @default(autoincrement())
+  name        String
+  value       Int
+  description String
+  imageUrl    String
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  juiceType   JuiceType
+  options     JuiceOption[]
+  extras      JuiceExtra[]
+  ingredient  JuiceIngredient[] // Relacionamento correto com JuiceIngredient
+  orders      Order[]
 }
 
-model Juice {
-  id        Int           @id @default(autoincrement())
-  name      String
-  value     BigInt
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-  juiceType JuiceType
-  options   JuiceOption[]
-  extras    JuiceExtra[]
-  fruits    JuiceFruit[]
-  orders    Order[]
+model JuiceIngredient {
+  id           Int        @id @default(autoincrement())
+  juice        Juice      @relation(fields: [juiceId], references: [id])
+  juiceId      Int
+  ingredients  Ingredient @relation(fields: [ingredientId], references: [id])
+  ingredientId Int
+}
 
-  @@map("juice")
+model Ingredient {
+  id     Int               @id @default(autoincrement())
+  name   String
+  juices JuiceIngredient[]
 }
 
 model JuiceOption {
@@ -83,16 +89,6 @@ model JuiceExtra {
   extraId Int
 
   @@map("juice-extra")
-}
-
-model JuiceFruit {
-  id      Int   @id @default(autoincrement())
-  juice   Juice @relation(fields: [juiceId], references: [id])
-  juiceId Int
-  fruit   Fruit @relation(fields: [fruitId], references: [id])
-  fruitId Int
-
-  @@map("juice-fruit")
 }
 
 model Machine {
