@@ -1,7 +1,9 @@
-import { NextFunction, Request, Response } from "express"
-import { ObjectSchema } from "joi"
+import { NextFunction, Request, Response } from 'express'
+import { ObjectSchema, ArraySchema } from 'joi'
 
-export function validateSchemaMiddleware(schema: ObjectSchema) {
+type Schema = ObjectSchema | ArraySchema
+
+export function validateSchemaMiddleware(schema: Schema) {
   return (req: Request, res: Response, next: NextFunction) => {
     const validation = schema.validate(req.body)
     if (validation.error) {
