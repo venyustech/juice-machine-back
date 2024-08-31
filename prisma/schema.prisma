@@ -21,6 +21,7 @@ enum OrderStatus {
   IN_PREPARATION
   DISPATCHED
   DELIVERED
+  FAILED
 }
 
 model Option {
@@ -103,17 +104,19 @@ model Machine {
 }
 
 model Order {
-  id           Int           @id @default(autoincrement())
-  juice        Juice         @relation(fields: [juiceId], references: [id])
-  juiceId      Int
-  machine      Machine       @relation(fields: [machineId], references: [id])
-  machineId    Int
-  userDocument String
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  options      OrderOption[]
-  extras       OrderExtra[]
-  status       OrderStatus
+  id             Int           @id @default(autoincrement())
+  juice          Juice         @relation(fields: [juiceId], references: [id])
+  juiceId        Int
+  machine        Machine       @relation(fields: [machineId], references: [id])
+  machineId      Int
+  userDocument   String
+  email          String
+  pickupDateTime String
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  options        OrderOption[]
+  extras         OrderExtra[]
+  status         OrderStatus
 
   @@map("order")
 }
