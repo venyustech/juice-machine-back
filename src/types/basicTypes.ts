@@ -11,6 +11,11 @@ export type Extra = {
   value: number
 }
 
+export type MachineData = {
+  name: string
+  local: string
+}
+
 export type IngredientName =
   | 'Laranja'
   | 'Maçã'
