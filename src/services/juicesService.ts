@@ -14,7 +14,7 @@ const juiceTypeLabels: { [key in JuiceType]: string } = {
 
 async function findMany(): Promise<JuiceResponseByType[]> {
   const juices = await juicesRepository.findJuices()
-  if (!juices) throw notFoundError('Juices not found')
+  if (!juices || juices.length === 0) throw notFoundError('Juices not found')
   const groupedJuices = assembleJuiceResponseByType(juices)
   return groupedJuices
 }
