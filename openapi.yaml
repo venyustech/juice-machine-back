@@ -1,0 +1,235 @@
+openapi: 3.0.0
+info:
+  title: Shaark Juice Machine API
+  version: 1.0.0
+  description: API para gerenciar sucos, máquinas e pedidos.
+servers:
+  - url: https://testecolab.onrender.com
+    description: Servidor de Desenvolvimento
+paths:
+  /machines:
+    get:
+      tags:
+        - Machine
+      summary: Listar máquinas
+      responses:
+        '200':
+          description: Retorna a lista de máquinas.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Machine'
+
+  /juices:
+    get:
+      tags:
+        - Juice
+      summary: Listar tipos de sucos
+      responses:
+        '200':
+          description: Retorna a lista de sucos organizados por tipo.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/JuiceTypeResponse'
+
+  /juice/{id}:
+    get:
+      tags:
+        - Juice
+      summary: Detalhes de um suco específico
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Retorna os detalhes de um suco específico.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JuiceDetailResponse'
+
+  /order/create:
+    post:
+      tags:
+        - Order
+      summary: Criar um novo pedido
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderPayload'
+      responses:
+        '201':
+          description: Pedido criado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+
+components:
+  schemas:
+    Machine:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        local:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    JuiceType:
+      type: string
+      description: |
+        O tipo de suco. Pode ser um dos seguintes valores:
+        - **SHARK**: Sucos especiais da linha "Shark Sucos".
+        - **NATURAL**
+        - **FUNCTIONAL**.
+        - **THAI**: Bebidas inspiradas na culinária tailandesa.
+        - **SMOOTHIE**
+        - **GENERIC**
+      enum:
+        - SHARK
+        - NATURAL
+        - FUNCTIONAL
+        - THAI
+        - SMOOTHIE
+        - GENERIC
+
+    JuiceTypeResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        label:
+          type: string
+        juiceType:
+          $ref: '#/components/schemas/JuiceType'
+        href:
+          type: string
+        juices:
+          type: array
+          items:
+            $ref: '#/components/schemas/Juice'
+
+    Juice:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        value:
+          type: integer
+        description:
+          type: string
+        imageUrl:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        juiceType:
+          $ref: '#/components/schemas/JuiceType'
+
+    JuiceDetailResponse:
+      allOf:
+        - $ref: '#/components/schemas/Juice'
+        - type: object
+          properties:
+            options:
+              type: object
+              additionalProperties:
+                type: boolean
+            extras:
+              type: object
+              additionalProperties:
+                type: object
+                properties:
+                  value:
+                    type: integer
+            ingredient:
+              type: array
+              items:
+                type: string
+
+    OrderStatus:
+      type: string
+      description: |
+        O estado atual do pedido. Pode ser um dos seguintes valores:
+        - **RECEIVED**: O pedido foi recebido com sucesso pelo sistema.
+        - **IN_PREPARATION**: O pedido está sendo preparado.
+        - **DISPATCHED**: O pedido foi despachado e está a caminho do local de coleta ou entrega.
+        - **DELIVERED**: O pedido foi entregue ao cliente.
+        - **FAILED**: Ocorreu um erro com o pedido, e ele não pôde ser processado corretamente.
+      enum:
+        - RECEIVED
+        - IN_PREPARATION
+        - DISPATCHED
+        - DELIVERED
+        - FAILED
+
+    OrderPayload:
+      type: object
+      properties:
+        juiceId:
+          type: integer
+        options:
+          type: object
+          additionalProperties:
+            type: boolean
+        extras:
+          type: object
+          additionalProperties:
+            type: boolean
+        machine:
+          type: string
+        quantity:
+          type: integer
+        cpf:
+          type: string
+        email:
+          type: string
+        pickupDateTime:
+          type: string
+
+    OrderResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        juiceId:
+          type: integer
+        machineId:
+          type: integer
+        userDocument:
+          type: string
+        email:
+          type: string
+        pickupDateTime:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/OrderStatus'

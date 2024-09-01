@@ -312,11 +312,43 @@ const genericJuiceData = (): GenericJuice[] => [
   }
 ]
 
+function transformSharkJuiceToPrismaInput(juice) {
+  return {
+    name: juice.name,
+    description: juice.description,
+    value: juice.value,
+    juiceType: juice.juiceType,
+    imageUrl: juice.imageUrl,
+    options: juice.options
+      ? {
+          create: juice.options.map((opt) => ({
+            option: { connect: { id: opt.option.id } }
+          }))
+        }
+      : undefined,
+    extras: juice.extras
+      ? {
+          create: juice.extras.map((ext) => ({
+            extra: { connect: { id: ext.extra.id } }
+          }))
+        }
+      : undefined,
+    ingredient: juice.ingredient
+      ? {
+          create: juice.ingredient.map((ing) => ({
+            ingredient: { connect: { id: ing.ingredients.id } }
+          }))
+        }
+      : undefined
+  }
+}
+
 export default {
   sharkJuicesData,
   naturalJuicesData,
   functionalJuicesData,
   smoothieJuiceData,
   thaiJuiceData,
-  genericJuiceData
+  genericJuiceData,
+  transformSharkJuiceToPrismaInput
 }

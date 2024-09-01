@@ -14,22 +14,27 @@ import { juiceIngredientMapping } from '../tests/factory/juiceIngredients.js'
 import juicesFactory from '../tests/factory/juicesFactory.js'
 import machinesFactory from '../tests/factory/machinesFactory.js'
 
-async function main() {
-  await createOptions()
-  await createExtras()
-  await createIngredients()
-  await createJuices()
-  await createMachines()
-}
-
-main()
-  .catch((e) => {
+export async function main() {
+  try {
+    await createOptions()
+    await createExtras()
+    await createIngredients()
+    await createJuices()
+    await createMachines()
+  } catch (e) {
     console.error(e)
-    process.exit(1)
-  })
-  .finally(async () => {
+    if (process.env.NODE_ENV !== 'test') {
+      process.exit(1)
+    } else {
+      throw e
+    }
+  } finally {
     await prisma.$disconnect()
-  })
+  }
+}
+if (require.main === module) {
+  main()
+}
 
 async function createOptions(): Promise<void> {
   const data: Option[] = [{ name: 'sugar' }, { name: 'ice' }, { name: 'milk' }]
